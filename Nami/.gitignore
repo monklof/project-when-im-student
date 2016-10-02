@@ -1,0 +1,10 @@
+*~
+[#]*[#]
+__pycache__
+.#*
+*.out
+*.pyc
+www/static/img/
+open/static/img/
+backstage/static/img/
+/wxapi/nohup.out

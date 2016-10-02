@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% block head-css%}
+<link rel="stylesheet" href="/static/css/monitor.css" type="text/css" />
+{% end %}
+{% block head-js%}
+<script>
+  window.dataObj = {{ data }}
+</script>
+
+<script src="/static/js/jquery.flot.js"></script>
+<script src="/static/js/jquery.flot.time.js"></script>
+<script src="/static/js/monitor2.js"></script>
+{% end %}
+
+{% block content %}
+
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3 col-md-2 sidebar" id="sidebar">
+      <ul class="nav nav-sidebar">
+        <li class="active"><a href="#" id="nav-resources-usage" class="pagenav" data-id="resources-usage">Resources Usage</a></li>
+        <li><a href="#" id="nav-running-processes" class="pagenav" data-id="running-processes">Running Processes</a></li>
+        <li>
+          <a href="#" data-target="#nav-second-overview" class="pagenav" data-id="system-info" id="nav-system-info" data-toggle="collapse" data-parent="#sidebar">System Info</a>
+          <ul class="sidebar-second nav nav-list collapse" id="nav-second-overview">
+            <li><a href="#system-info-overview">Overview</a></li>
+            <li><a href="#system-info-filesystem">File System</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div><!--end sidbar-->
+    
+
+    <div class="container" id="content-containter">
+      <!--dashboard-->
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id="page-resources-usage">
+        <h1 class="page-header">Resources Usage</h1>
+        
+        <div class="btn-group-vertical fixed-right" data-toggle="buttons">
+          <label class="btn btn-default btn-sm resources-time active" data-id="realtime"><input type="radio">real time</label>
+          <label class="btn btn-default btn-sm resources-time" data-id="1hour"><input type="radio">1 hour</label>
+          <label class="btn btn-default btn-sm resources-time" data-id="1day"><input type="radio">1 day</label>
+          <label class="btn btn-default btn-sm resources-time" data-id="1week"><input type="radio">1 week </label>
+          <label class="btn btn-default btn-sm resources-time" data-id="1month"><input type="radio">1 month</label>
+        </div>
+
+        <h2 class="sub-header">CPU</h2>
+        <div class="fluid-container curve-container">
+          <div class="flot-placeholder" id="cpu-flot-placeholder"></div>
+        </div>
+
+        <h2 class="sub-header">Memory</h2>
+        <div class="fluid-container curve-container">
+          <div class="flot-placeholder"  id="mem-flot-placeholder"></div>
+        </div>
+        <h2 class="sub-header">Network</h2>
+        <div class="fluid-container curve-container">
+          <div class="flot-placeholder"  id="net-flot-placeholder"></div>
+        </div>
+      </div><!--end dashboard-->
+      
+      <!--running processes-->
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" style="display:none;" id="page-running-processes">
+        <h1 class="page-header">Running Processes</h1>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="panel-title">overview</div>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-3">
+                <label>Total: </label><span  id="processes-total">222</span>
+              </div>
+              <div class="col-md-3">
+                <label>Running: </label><span id="processes-running">2</span>
+              </div>
+              <div class="col-md-3">
+                <label>Sleeping: </label><span id="processes-sleeping">220</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive" id="processes-table"> <!----->
+          <table class="table table-hover" >
+            <thead id="processes-table-thead">
+              <tr>
+                <th id="processinfo-name" class="processinfo-sort" data-id="name">Name</th>
+                <th id="processinfo-state" class="processinfo-sort" data-id="state">State</th>
+                <th id="processinfo-cpuRate" class="processinfo-sort selected" data-id="cpuRate">Cpu%</th>
+                <th id="processinfo-memRate" class="processinfo-sort" data-id="memRate">Mem%</th>
+                <th id="processinfo-memResident" class="processinfo-sort" data-id="memResident">ResidentMem</th>
+                <th id="processinfo-memSize" class="processinfo-sort" data-id="memSize">VirtMem</th>
+                <th id="processinfo-pid" class="processinfo-sort" data-id="pid">Pid</th>
+                <th id="processinfo-runtime" class="processinfo-sort" data-id="runtime">Runtime</th>
+              </tr>
+            </thead>
+            <tbody id="processes-table-tbody">
+              <tr id="pid" class="process-info selected">
+                <td>top</td>
+                <td>sleeping</td>
+                <td>1</td>
+                <td>1</td>
+                <td>11M</td>
+                <td>111M</td>
+                <td>5447</td>
+                <td>12.5s</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr><a class="btn btn-warning pull-right">Terminate</a></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main"  style="display:none;" id="page-system-info">
+        <h1 class="page-header">System Info</h1>
+
+        <h2 class="sub-header" id="system-info-overview"></h2>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="panel-title">
+              <h2 class="sub-header">CPU</h2>            
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-3">
+                <label>cpu name: </label><span id="cpu-name">Intel(R) Core(TM) i3-2350M CPU @ 2.30GHz</span>
+              </div>
+              <div class="col-md-3">
+                <label>cpu cores: </label><span id="cpu-cores">2</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="panel-title">
+              <h2 class="sub-header">Version</h2>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <span id="system-version">version</span>
+          </div>
+        </div>
+        <!--end overview-->
+
+        <h2 class="sub-header" id="system-info-filesystem">File System</h2>
+        
+      </div>
+    </div>
+  </div>
+</div>
+{% end%}

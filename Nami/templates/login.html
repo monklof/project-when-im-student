@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block head-css %}
+<link rel="stylesheet" href="{{ static_url("css/login.css") }}" type="text/css"/>
+{% end%}
+{% block head-js%}
+<script src="{{ static_url("js/sha256.js") }}"></script>
+<script>
+$("#submit-btn")[0].onclick = function(evt){
+    evt.preventDefault();
+    var username = $("#username-input").val().trim();
+    var password = CryptoJS.SHA256($("#password-input").val().trim()).toString(CryptoJS.enc.Hex);
+    var args = {
+        username:username,
+        password:password
+    }
+    
+    $("#notice").hide();
+    $.ajax({
+        type:"POST",
+        url:"/Nami/login",
+        data:$.param(args),
+        success:function(res){
+            if (res.success)
+                window.location = res.next;
+            else{
+                $("#notice").show();
+                $("#password-input").val("");
+            }
+        },
+        error:function(res){
+            $("#notice").show();
+            $("#password-input").val("");
+        }
+    });
+}
+</script>
+{% end %}
+
+{% block content %}
+  <form class="form-login" method="POST">
+    <h2>Please log in</h2>
+    <input id="username-input" class="form-login-heading form-control" name="username" type="text" placeholder="Your Name" required autofocus>
+    <input id="password-input" class="form-login-heading form-control" name="password" type="password" class="" placeholder="Password" required>
+    <div class="form-group has-error">
+      <label id="notice" class="control-label" style="display:none;" for="inputError1">用户名或密码错误</label>
+    </div>
+    <button id="submit-btn" class="btn btn-lg btn-primary btn-block" type="submit">Sign In</button>
+  </form>
+    
+{% end%}
